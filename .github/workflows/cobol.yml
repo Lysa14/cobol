@@ -1,0 +1,74 @@
+name: COBOL Build, Security Scan, and Analysis
+
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  build:
+  
+    runs-on: ubuntu-latest
+  
+    strategy:
+      matrix:
+        gnuCobol_version: [3.x]
+       
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install  packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install automake libtool libgmp-dev autopoint libdb5.3-dev libxml2-dev \
+            libcjson-dev bison flex help2man gettext texlive subversion texinfo -y
+            
+      - name: Get GNU Cobol
+        run: |
+          echo ${{ matrix.gnuCobol_version }}
+          svn checkout http://svn.code.sf.net/p/gnucobol/code/branches/gnucobol-${{ matrix.gnuCobol_version }}
+          cd gnucobol-${{ matrix.gnuCobol_version }}
+
+      - name: Build environment setup
+        working-directory: gnucobol-${{ matrix.gnuCobol_version }}
+        run: |
+          export TERM="vt100"
+          echo "TERM=$TERM" >> $GITHUB_ENV
+          echo "INSTALL_PATH=$(pwd)" >> $GITHUB_ENV
+          
+      - name: GnuCobol Configuration 
+        working-directory: gnucobol-${{ matrix.gnuCobol_version }}
+        run: |
+          sed -i 's/GETTEXT_MACRO_VERSION = 0.19/GETTEXT_MACRO_VERSION = 0.20/g' po/Makefile.in.in
+          autoreconf --install --force
+          ./configure
+          sed -i 's/GETTEXT_MACRO_VERSION = 0.19/GETTEXT_MACRO_VERSION = 0.20/g' po/Makefile.in
+          sed -i 's/GETTEXT_MACRO_VERSION = 0.19/GETTEXT_MACRO_VERSION = 0.20/g' po/Makefile
+       
+      - name: make
+        working-directory: gnucobol-${{ matrix.gnuCobol_version }}
+        run: |
+          make
+          sudo make install
+          make check 
+
+      - name: ldconfig
+        run: sudo ldconfig
+      
+      - name: Unit Test 
+        working-directory: gnucobol-${{ matrix.gnuCobol_version }}
+        run: |
+         sudo apt-get install autoconf
+         autoreconf -i -f 
+         ./configure
+         make 
+         sudo make install
+         sudo ldconfig 
+         make check > tests.log 
+    
+    #      - name: Run zUnit tests
+    #      run: |
+    #      cobc -free -o my_program *.cbl
+    #      zunit *.tst
+     
