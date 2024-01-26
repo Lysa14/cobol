@@ -2,14 +2,14 @@
 FROM debian:latest
 
 # Copiez les fichiers source COBOL dans l'image
-COPY Calculator.cbl /app/Calculator.cbl
-COPY CalculatorTest.cbl /app/CalculatorTest.cbl
+COPY calculator.cbl /app/calculator.cbl
+COPY testCalculator.cbl /app/testCalculator.cbl
 
 WORKDIR /app
 
-RUN cobc -free -x -o Calculator Calculator.cbl
+RUN cobc -free -x -o Calculator calculator.cbl
 
-RUN cobc -free -x -o CalculatorTest CalculatorTest.cbl
+RUN cobc -free -x -o CalculatorTest testCalculator.cbl
 
 
 CMD ["./Calculator"]
