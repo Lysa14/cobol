@@ -1,5 +1,5 @@
 # Utilisez une image de base prenant en charge COBOL
-FROM openmainframeproject/cobol-base
+FROM debian:latest
 
 # Copiez les fichiers source COBOL dans l'image
 COPY Calculator.cbl /app/Calculator.cbl
