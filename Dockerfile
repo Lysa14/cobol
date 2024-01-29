@@ -10,6 +10,8 @@ COPY testCalculator.cbl /app/testCalculator.cbl
 
 WORKDIR /app
 
+RUN sed -i 's/deb.debian.org/mirrors.ubuntu.com/g' /etc/apt/sources.list
+
 RUN cobc -free -x -o Calculator calculator.cbl
 
 RUN cobc -free -x -o CalculatorTest testCalculator.cbl
