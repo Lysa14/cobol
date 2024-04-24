@@ -1,5 +1,5 @@
 # Utilisez une image de base prenant en charge COBOL
-FROM debian:latest
+FROM debian:12.5
 #RUN sed -i 's/deb.debian.org/mirrors.ubuntu.com/g' /etc/apt/sources.list
 # Installez le compilateur COBOL
 #RUN apt-get update && apt-get install -y gnucobol
